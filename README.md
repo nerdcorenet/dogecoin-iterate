@@ -53,7 +53,7 @@ You can see some examples by looking at the [manual page source](https://github.
 ## Credits
 
 Original [bitcoin-iterate](https://github.com/rustyrussell/bitcoin-iterate)
-developed by Rusty Russell (rusty on #dogecoin-wizards on Freenode).
+developed by Rusty Russell (rusty on #bitcoin-wizards on Freenode).
 
 Dogecoin modifications by Mike Mallett (nerdcore on Freenode).
 D7AinzNgAxZXyGzwKeynmeDGpuNYUy38Lp
