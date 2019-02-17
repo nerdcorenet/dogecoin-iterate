@@ -1,23 +1,23 @@
-BITCOIN-ITERATE(1)
+DOGECOIN-ITERATE(1)
 ==================
 :doctype: manpage
 
 
 NAME
 ----
-bitcoin-iterate - Iterate over bitcoind's block files.
+dogecoin-iterate - Iterate over dogecoind's block files.
 
 
 SYNOPSIS
 --------
-*bitcoin-iterate* ['OPTIONS']
+*dogecoin-iterate* ['OPTIONS']
 
 DESCRIPTION
 -----------
 
-*bitcoin-iterate* creates a text dump of the blockchain contents, by
-directly reading *bitcoind*'s block files.  This is much faster than
-using *bitcoin-cli* to query bitcoind directly, though *bitcoind* can
+*dogecoin-iterate* creates a text dump of the blockchain contents, by
+directly reading *dogecoind*'s block files.  This is much faster than
+using *dogecoin-cli* to query dogecoind directly, though *dogecoind* can
 provide more contextual metadata.
 
 It iterates each block (from genesis to longest tip), and within that
@@ -25,9 +25,9 @@ block iterates each transaction (from coinbase onwards in block
 order), and within that transaction iterates each input (in order),
 and then each output (in order).
 
-Note that bitcoin convention is to print block and transaction hashes
+Note that dogecoin convention is to print block and transaction hashes
 backwards ("big-endian"): that convention is used here for compatibility
-with block explorers and bitcoind.
+with block explorers and dogecoind.
 
 OPTIONS
 -------
@@ -62,7 +62,7 @@ OPTIONS
   %tW: transaction witness length (in bytes)
   %tF: transaction fee paid by block (negative for coinbase reward)
   %tN: transaction number within block
-  %tD: transaction bitcoin days destroyed (by block times)
+  %tD: transaction dogecoin days destroyed (by block times)
   %tX: transaction as a hex string (including inputs and outputs)
 
 *--input*='FORMAT'::
@@ -107,18 +107,18 @@ OPTIONS
 *-q, --quiet*::
   Don't print progress messages, just print the output.  All progress
   messages are printed to standard output prefixed with
-  "bitcoin-iterate:" for easy filtering anyway.
+  "dogecoin-iterate:" for easy filtering anyway.
 
 *-t, --testnet*::
-  Expect blocks from testnet3 rather than the main bitcoin chain (and
-  change default blockdir to be ~/.bitcoin/testnet3/blocks).
+  Expect blocks from testnet3 rather than the main dogecoin chain (and
+  change default blockdir to be ~/.dogecoin/testnet3/blocks).
 
 *--progress*='NUM-CHARS'::
   Print '.' to standard error such that at there will be this many drawn
   at completion.
 
 *--blockdir*='DIRECTORY'::
-  Use this directory to find block files rather than ~/.bitcoin/blocks.
+  Use this directory to find block files rather than ~/.dogecoin/blocks.
 
 *--cache*='DIRECTORY'::
   Cache results in this directory; particularly useful
@@ -134,38 +134,38 @@ EXAMPLES
 --------
 .Simple sanity check: read blocks and do nothing
 ===================================================================
-bitcoin-iterate
+dogecoin-iterate
 ===================================================================
 
 .Print out the height and length of every block, separated by a space
 ===================================================================
-bitcoin-iterate --block='%bh %bl'
+dogecoin-iterate --block='%bh %bl'
 ===================================================================
 
 .Print out the block height and weight of every transaction
 ===================================================================
-bitcoin-iterate --tx='height=%bh length=%tw'
+dogecoin-iterate --tx='height=%bh length=%tw'
 ===================================================================
 
 .Print out the length of every scriptSig (input script)
 ===================================================================
-bitcoin-iterate --input=%il
+dogecoin-iterate --input=%il
 ===================================================================
 
 .Print out the length of every scriptPubKey (output script).
 ===================================================================
-bitcoin-iterate --output=%ol
+dogecoin-iterate --output=%ol
 ===================================================================
 
 .Print out <block number>,<transaction hash>,<script> for each output
 ===================================================================
-bitcoin-iterate --output=%bn,%th,%os
+dogecoin-iterate --output=%bn,%th,%os
 ===================================================================
 
 NOTES
 -----
 Use of *%tF*, *%iB*, *%iT*, *%ia* or *%ip* significantly slows iteration, as
-this requires *bitcoin-iterate* to track unspent outputs.
+this requires *dogecoin-iterate* to track unspent outputs.
 
 BUGS
 ----
@@ -176,11 +176,13 @@ which may not be the same as strongest chain in theoretical cases.
 
 AUTHOR
 ------
-Rusty Russell <rusty@rustcorp.com.au> wrote it, pulling in CCAN modules.
+Rusty Russell <rusty@rustcorp.com.au> wrote bitcoin-iterate, pulling
+in CCAN modules.
+Mike Mallett <mike@nerdcore.net> made Dogecoin modifications, WOW!
 
 RESOURCES
 ---------
-Main web site: http://github.com/rustyrussell/bitcoin-iterate
+Main web site: http://github.com/nerdcorenet/dogecoin-iterate
 
 COPYING
 -------

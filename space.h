@@ -1,5 +1,5 @@
-#ifndef BITCOIN_ITERATE_SPACE_H
-#define BITCOIN_ITERATE_SPACE_H
+#ifndef DOGECOIN_ITERATE_SPACE_H
+#define DOGECOIN_ITERATE_SPACE_H
 #include <ccan/tal/tal.h>
 #include <assert.h>
 
@@ -28,4 +28,4 @@ static inline void *space_alloc(struct space *space, size_t bytes)
 #define space_alloc_arr(space, type, num) \
 	((type *)space_alloc((space), sizeof(type) * (num)))
 
-#endif /* BITCOIN_ITERATE_SPACE_H */
+#endif /* DOGECOIN_ITERATE_SPACE_H */

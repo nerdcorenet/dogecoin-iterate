@@ -71,7 +71,7 @@ static void print_le64(u64 v)
 	print_hex(&l, sizeof(l));
 }
 
-void dump_tx_input(const struct bitcoin_transaction_input *input)
+void dump_tx_input(const struct dogecoin_transaction_input *input)
 {
 	print_hash(input->hash);
 	print_le32(input->index);
@@ -80,14 +80,14 @@ void dump_tx_input(const struct bitcoin_transaction_input *input)
 	print_le32(input->sequence_number);
 }
 
-void dump_tx_output(const struct bitcoin_transaction_output *output)
+void dump_tx_output(const struct dogecoin_transaction_output *output)
 {
 	print_le64(output->amount);
 	print_varint(output->script_length);
 	print_hex(output->script, output->script_length);
 }
 
-void dump_tx(const struct bitcoin_transaction *tx)
+void dump_tx(const struct dogecoin_transaction *tx)
 {
 	varint_t i;
 
@@ -101,7 +101,7 @@ void dump_tx(const struct bitcoin_transaction *tx)
 	print_le32(tx->lock_time);
 }
 
-void dump_block_header(const struct bitcoin_block *b)
+void dump_block_header(const struct dogecoin_block *b)
 {
 	print_le32(b->version);
 	print_hash(b->prev_hash);

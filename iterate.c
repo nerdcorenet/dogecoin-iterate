@@ -46,8 +46,8 @@ struct block {
 	off_t pos;
 	/* So we can iterate forwards. */
 	struct block *next;
-	/* Bitcoin block header. */
-	struct bitcoin_block bh;
+	/* Dogecoin block header. */
+	struct dogecoin_block bh;
 };
 
 /* Hash blocks by sha */
@@ -127,7 +127,7 @@ HTABLE_DEFINE_TYPE(struct utxo, keyof_utxo, hash_sha, utxohash_eq, utxo_map);
  * 2) lots of wallets still send change to the same public key hash as
  *    they were received originally.
  */
-static void guess_output_types(const struct bitcoin_transaction *t, u8 *types)
+static void guess_output_types(const struct dogecoin_transaction *t, u8 *types)
 {
 	if (t->output_count == 2) {
 		bool first_round = ((t->output[0].amount % 1000) == 0);
@@ -151,7 +151,7 @@ static u8 *output_types(struct utxo *utxo)
 	return (u8 *)&utxo->amount[utxo->num_outputs];
 }
 
-static bool is_unspendable(const struct bitcoin_transaction_output *o)
+static bool is_unspendable(const struct dogecoin_transaction_output *o)
 {
 	return (o->script_length > 0 && o->script[0] == OP_RETURN);
 }
@@ -159,7 +159,7 @@ static bool is_unspendable(const struct bitcoin_transaction_output *o)
 static void add_utxo(const tal_t *tal_ctx,
 		     struct utxo_map *utxo_map,
 		     const struct block *b,
-		     const struct bitcoin_transaction *t,
+		     const struct dogecoin_transaction *t,
 		     u32 txnum, off_t off)
 {
 	struct utxo *utxo;
@@ -199,7 +199,7 @@ static void add_utxo(const tal_t *tal_ctx,
 }
 
 static void release_utxo(struct utxo_map *utxo_map,
-			 const struct bitcoin_transaction_input *i)
+			 const struct dogecoin_transaction_input *i)
 {
 	struct utxo *utxo;
 
@@ -315,7 +315,7 @@ static bool set_height(struct block_map *block_map, struct block *b)
 /* This is kind of silly, since they can print it and sum it
  * themselves.  But convenient though... */
 static s64 calculate_fees(const struct utxo_map *utxo_map,
-			  const struct bitcoin_transaction *t,
+			  const struct dogecoin_transaction *t,
 			  bool is_coinbase)
 {
 	size_t i;
@@ -363,7 +363,7 @@ static s64 calculate_bdc(const struct utxo *u, u32 timestamp)
 }
 
 static s64 calculate_bdd(const struct utxo_map *utxo_map,
-			  const struct bitcoin_transaction *t,
+			  const struct dogecoin_transaction *t,
 			  bool is_coinbase, u32 timestamp)
 {
 	size_t i;
@@ -402,10 +402,10 @@ static s64 calculate_bdd(const struct utxo_map *utxo_map,
 static void print_format(const char *format,
 			 const struct utxo_map *utxo_map,
 			 struct block *b,
-			 struct bitcoin_transaction *t,
+			 struct dogecoin_transaction *t,
 			 size_t txnum,
-			 struct bitcoin_transaction_input *i,
-			 struct bitcoin_transaction_output *o,
+			 struct dogecoin_transaction_input *i,
+			 struct dogecoin_transaction_output *o,
 			 struct utxo *u)
 {
 	const char *c;
@@ -644,7 +644,7 @@ static char *opt_set_hash(const char *arg, u8 *h)
 	if (!hex_decode(arg, strlen(arg), hash, SHA256_DIGEST_LENGTH))
 		return "Bad hex string (needs 64 hex chars)";
 
-	/* Backwards endian is the Bitcoin Way */
+	/* Backwards endian is the Dogecoin Way */
 	for (i = 0; i < SHA256_DIGEST_LENGTH; i++)
 		h[i] = hash[SHA256_DIGEST_LENGTH-i-1];
 
@@ -866,7 +866,7 @@ int main(int argc, char *argv[])
 			   "  %tW: transaction witness length (in bytes)\n"
 			   "  %tN: transaction number\n"
 			   "  %tF: transaction fee paid\n"
-			   "  %tD: transaction bitcoin days destroyed\n"
+			   "  %tD: transaction dogecoin days destroyed\n"
 			   "  %tX: transaction in hex\n"
 			   "Valid input format:\n"
 			   "  %ia: input amount\n"
@@ -898,7 +898,7 @@ int main(int argc, char *argv[])
 			   "  %us: utxo spent output count\n"
 			   "  %uU: utxo unspent amount\n"
 			   "  %uS: utxo spent amount\n"
-			   "  %uC: utxo bitcoin days created\n",
+			   "  %uC: utxo dogecoin days created\n",
 			   "Display help message");
 	opt_register_arg("--block", opt_set_charp, NULL, &blockfmt,
 			   "Format to print for each block");
@@ -921,7 +921,7 @@ int main(int argc, char *argv[])
 	opt_register_noarg("--testnet|-t", opt_set_bool, &use_testnet,
 			 "Look for testnet3 blocks");
 	opt_register_arg("--blockdir", opt_set_charp, NULL, &blockdir,
-			 "Block directory instead of ~/.bitcoin/[testnet3/]blocks");
+			 "Block directory instead of ~/.dogecoin/[testnet3/]blocks");
 	opt_register_arg("--end-hash", opt_set_hash, NULL, tip,
 			 "Best blockhash to use instead of longest chain.");
 	opt_register_arg("--start-hash", opt_set_hash, NULL, start_hash,
@@ -937,11 +937,8 @@ int main(int argc, char *argv[])
 	if (argc != 1)
 		opt_usage_and_exit(NULL);
 
-	if (use_testnet) {
-		netmarker = 0x0709110B;
-	} else {
-		netmarker = 0xD9B4BEF9;
-	}
+	// dogecoind uses the same marker for testnet and mainnet
+	netmarker = 0xC0C0C0C0;
 
 	block_fnames = block_filenames(tal_ctx, blockdir, use_testnet);
 
@@ -982,7 +979,7 @@ int main(int argc, char *argv[])
 		}
 
 		if (!quiet)
-			printf("bitcoin-iterate: processing %s (%zi/%zu)\n",
+			printf("dogecoin-iterate: processing %s (%zi/%zu)\n",
 			       block_fnames[i], i+1, tal_count(block_fnames));
 
 		last_discard = off = 0;
@@ -1006,7 +1003,7 @@ int main(int argc, char *argv[])
 			b = tal(tal_ctx, struct block);
 			b->filenum = i;
 			b->height = -1;
-			if (!read_bitcoin_block_header(&b->bh, f, &off,
+			if (!read_dogecoin_block_header(&b->bh, f, &off,
 						       b->sha, netmarker)) {
 				tal_free(b);
 				break;
@@ -1020,7 +1017,7 @@ int main(int argc, char *argv[])
 					goto check_genesis;
 			}
 
-			skip_bitcoin_transactions(&b->bh, block_start, &off);
+			skip_dogecoin_transactions(&b->bh, block_start, &off);
 			if (off > last_discard + CHUNK && f->mmap) {
 				size_t len = CHUNK;
 				if ((size_t)last_discard + len > f->len)
@@ -1069,7 +1066,7 @@ check_genesis:
 	}
 
 	if (!quiet)
-		printf("bitcoin-iterate: best block height: %u (of %zu)\n",
+		printf("dogecoin-iterate: best block height: %u (of %zu)\n",
 		       best->height, block_count);
 
 	/* Now iterate down from best, setting next pointers. */
@@ -1104,7 +1101,7 @@ check_genesis:
 	needs_utxo = false;
 
 	/* We need it for fee calculation, UTXO block number, or
-	 * bitcoin days created/destroyed.  Can be asked by tx, input,
+	 * dogecoin days created/destroyed.  Can be asked by tx, input,
 	 * output, or UTXO. */
 	if (txfmt && strstr(txfmt, "%tF"))
 		needs_utxo = true;
@@ -1146,7 +1143,7 @@ check_genesis:
 	/* Now run forwards. */
 	for (b = genesis; b; b = b->next) {
 		off_t off;
-		struct bitcoin_transaction *tx;
+		struct dogecoin_transaction *tx;
 
 		if (b == start) {
 			/* Are we UTXO caching? */
@@ -1183,13 +1180,13 @@ check_genesis:
 		off = b->pos;
 
 		space_init(&space);
-		tx = space_alloc_arr(&space, struct bitcoin_transaction,
+		tx = space_alloc_arr(&space, struct dogecoin_transaction,
 				     b->bh.transaction_count);
 		for (i = 0; i < b->bh.transaction_count; i++) {
 			size_t j;
 			off_t txoff = off;
 
-			read_bitcoin_transaction(&space, &tx[i],
+			read_dogecoin_transaction(&space, &tx[i],
 						 block_file(b->filenum), &off);
 
 			if (!start && txfmt)

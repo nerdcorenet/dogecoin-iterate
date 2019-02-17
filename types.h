@@ -1,5 +1,5 @@
-#ifndef BITCOIN_PARSE_TYPES_H
-#define BITCOIN_PARSE_TYPES_H
+#ifndef DOGECOIN_PARSE_TYPES_H
+#define DOGECOIN_PARSE_TYPES_H
 #include <ccan/short_types/short_types.h>
 #include <openssl/sha.h>
 
@@ -7,8 +7,8 @@
 #define varint_t u64
 
 /* These are little endian on disk. */
-struct bitcoin_block {
-	u32 D9B4BEF9;
+struct dogecoin_block {
+	u32 C0C0C0C0;
 	u32 len;
 	u32 version;
 	u8 prev_hash[32];
@@ -19,12 +19,12 @@ struct bitcoin_block {
 	varint_t transaction_count;
 };
 
-struct bitcoin_transaction {
+struct dogecoin_transaction {
 	u32 version;
 	varint_t input_count;
-	struct bitcoin_transaction_input *input;
+	struct dogecoin_transaction_input *input;
 	varint_t output_count;
-	struct bitcoin_transaction_output *output;
+	struct dogecoin_transaction_output *output;
 	u32 lock_time;
 
 	/* We calculate these as we read in transaction: */
@@ -35,13 +35,13 @@ struct bitcoin_transaction {
 	u32 total_len;
 };
 
-struct bitcoin_transaction_output {
+struct dogecoin_transaction_output {
 	u64 amount;
 	varint_t script_length;
 	u8 *script;
 };
 
-struct bitcoin_transaction_input {
+struct dogecoin_transaction_input {
 	u8 hash[32];
 	u32 index; /* output number referred to by above */
 	varint_t script_length;
@@ -61,4 +61,4 @@ struct bitcoin_transaction_input {
 #define OP_CHECKSIG	0xAC
 #define OP_HASH160	0xA9
 
-#endif /* BITCOIN_PARSE_TYPES_H */
+#endif /* DOGECOIN_PARSE_TYPES_H */

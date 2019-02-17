@@ -1,5 +1,5 @@
-#ifndef BITCOIN_PARSE_PARSE_H
-#define BITCOIN_PARSE_PARSE_H
+#ifndef DOGECOIN_PARSE_PARSE_H
+#define DOGECOIN_PARSE_PARSE_H
 #include "types.h"
 #include "io.h"
 
@@ -10,17 +10,17 @@ bool next_block_header_prefix(struct file *f, off_t *off, const u32 marker);
 
 /* Step 2: Now, read in the block header, and calculate double-SHA*/
 bool
-read_bitcoin_block_header(struct bitcoin_block *block,
+read_dogecoin_block_header(struct dogecoin_block *block,
 			  struct file *f, off_t *off,
 			  u8 block_md[SHA256_DIGEST_LENGTH],
 			  const u32 marker);
 
 /* Step 3: Either skip all the transactions, or... */
-void skip_bitcoin_transactions(const struct bitcoin_block *b,
+void skip_dogecoin_transactions(const struct dogecoin_block *b,
 			       off_t block_start, off_t *off);
 
 /* ... read them in (call this repeatedly). Allocates off ctx. */
-void read_bitcoin_transaction(struct space *space,
-			      struct bitcoin_transaction *t,
+void read_dogecoin_transaction(struct space *space,
+			      struct dogecoin_transaction *t,
 			      struct file *f, off_t *off);
-#endif /* BITCOIN_PARSE_PARSE_H */
+#endif /* DOGECOIN_PARSE_PARSE_H */

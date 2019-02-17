@@ -8,30 +8,30 @@ LDFLAGS = -O3 -flto
 LDLIBS := -lcrypto
 BIN_DIR := /usr/local/bin
 
-all: bitcoin-iterate doc/bitcoin-iterate.1
+all: dogecoin-iterate doc/dogecoin-iterate.1
 
 .PHONY: install
 
 install:
-	cp bitcoin-iterate $(BIN_DIR)/bitcoin-iterate
+	cp dogecoin-iterate $(BIN_DIR)/dogecoin-iterate
 
 $(CCAN_OBJS) $(ITERATE_OBJS): ccan/config.h
 
-bitcoin-iterate: $(ITERATE_OBJS) $(CCAN_OBJS)
+dogecoin-iterate: $(ITERATE_OBJS) $(CCAN_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(ITERATE_OBJS) $(CCAN_OBJS) $(LDLIBS)
 
-doc/bitcoin-iterate.1: doc/bitcoin-iterate.1.txt
+doc/dogecoin-iterate.1: doc/dogecoin-iterate.1.txt
 	a2x --format=manpage $<
 
 check:
 	$(MAKE) -C test check
 
 clean:
-	$(RM) bitcoin-iterate $(ITERATE_OBJS) $(CCAN_OBJS)
+	$(RM) dogecoin-iterate $(ITERATE_OBJS) $(CCAN_OBJS)
 
 distclean: clean
 	$(RM) ccan/config.h
-	$(RM) doc/bitcoin-iterate.1
+	$(RM) doc/dogecoin-iterate.1
 
 ccan/config.h: ccan/tools/configurator/configurator
 	$< > $@

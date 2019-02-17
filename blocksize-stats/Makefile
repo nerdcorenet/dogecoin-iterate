@@ -13,12 +13,12 @@ clean:
 
 # All outputs [blockheight,txnum,txlen,amount]
 outputs.csv:
-	../bitcoin-iterate -q --output=%bN,%tN,%tl,%oa > $@
+	../dogecoin-iterate -q --output=%bN,%tN,%tl,%oa > $@
 
 # Eliminate outputs which have an all ASCII output of at least 20
 # bytes (so false positive rate ~ 1 in million).
 outputs-nospam.csv:
-	../bitcoin-iterate -q --output=%bN,%tN,%tl,%to,%os | grep -v ',\([0-9a-f][0-9a-f]\)*\([234567].\)\{20,\}' > $@
+	../dogecoin-iterate -q --output=%bN,%tN,%tl,%to,%os | grep -v ',\([0-9a-f][0-9a-f]\)*\([234567].\)\{20,\}' > $@
 
 # We do this by filtering out all-ascii outputs (above), and only
 # printing txs if they still have all their outputs.
@@ -47,7 +47,7 @@ blocks-%.csv: transaction-%.csv
 
 # Actual unchanged stats.
 normal-blocksize.csv:
-	(echo 'Normal'; ../bitcoin-iterate -q --block=%bl) > $@
+	(echo 'Normal'; ../dogecoin-iterate -q --block=%bl) > $@
 
 # Chunked stats: preserve top line, chunk the rest into averages.
 grouped-$(GROUP_SIZE)-%.csv: %.csv

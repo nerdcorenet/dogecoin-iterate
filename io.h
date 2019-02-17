@@ -1,5 +1,5 @@
-#ifndef BITCOIN_PARSE_IO_H
-#define BITCOIN_PARSE_IO_H
+#ifndef DOGECOIN_PARSE_IO_H
+#define DOGECOIN_PARSE_IO_H
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -29,4 +29,4 @@ void file_append(struct file *f, const void *buf, size_t size);
 void file_open(struct file *f, const char *name, off_t len, int oflags);
 
 void file_close(struct file *f);
-#endif /* BITCOIN_PARSE_IO_H */
+#endif /* DOGECOIN_PARSE_IO_H */

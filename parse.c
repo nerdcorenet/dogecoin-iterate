@@ -83,7 +83,7 @@ static void pull_hash(struct file *f, off_t *poff, u8 dst[32])
 }
 
 static void read_input(struct space *space, struct file *f, off_t *poff,
-		       struct bitcoin_transaction_input *input)
+		       struct dogecoin_transaction_input *input)
 {
 	pull_hash(f, poff, input->hash);
 	input->index = pull_u32(f, poff);
@@ -96,7 +96,7 @@ static void read_input(struct space *space, struct file *f, off_t *poff,
 }
 
 static void read_output(struct space *space, struct file *f, off_t *poff,
-			struct bitcoin_transaction_output *output)
+			struct dogecoin_transaction_output *output)
 {
 	output->amount = pull_u64(f, poff);
 	output->script_length = pull_varint(f, poff);
@@ -118,7 +118,7 @@ static void sha_add(SHA256_CTX *sha256, struct file *f, off_t start, off_t len)
 
 static void read_script_witnesses(struct space *space,
 				  struct file *f, off_t *poff,
-				  struct bitcoin_transaction_input *input,
+				  struct dogecoin_transaction_input *input,
 				  varint_t input_count)
 {
 	varint_t i;
@@ -149,8 +149,8 @@ static void read_script_witnesses(struct space *space,
 	}
 }
 
-void read_bitcoin_transaction(struct space *space,
-			      struct bitcoin_transaction *trans,
+void read_dogecoin_transaction(struct space *space,
+			      struct dogecoin_transaction *trans,
 			      struct file *f, off_t *poff)
 {
 	size_t i;
@@ -185,13 +185,13 @@ void read_bitcoin_transaction(struct space *space,
 	}
 
 	trans->input = space_alloc_arr(space,
-				       struct bitcoin_transaction_input,
+				       struct dogecoin_transaction_input,
 				       trans->input_count);
 	for (i = 0; i < trans->input_count; i++)
 		read_input(space, f, poff, trans->input + i);
 	trans->output_count = pull_varint(f, poff);
 	trans->output = space_alloc_arr(space,
-					struct bitcoin_transaction_output,
+					struct dogecoin_transaction_output,
 					trans->output_count);
 	for (i = 0; i < trans->output_count; i++)
                read_output(space, f, poff, trans->output + i);
@@ -210,7 +210,7 @@ void read_bitcoin_transaction(struct space *space,
 	sha_add(&sha256, f, hash_start, *poff - hash_start);
 	len += *poff - hash_start;
 
-	/* Bitcoin uses double sha (it's not quite known why...) */
+	/* Dogecoin uses double sha (it's not quite known why...) */
 	SHA256_Final(trans->sha256, &sha256);
 	SHA256_Init(&sha256);
 	SHA256_Update(&sha256, trans->sha256, sizeof(trans->sha256));
@@ -238,7 +238,7 @@ bool next_block_header_prefix(struct file *f, off_t *off, const u32 marker)
 }
 
 bool
-read_bitcoin_block_header(struct bitcoin_block *block,
+read_dogecoin_block_header(struct dogecoin_block *block,
 			  struct file *f, off_t *off,
 			  u8 block_md[SHA256_DIGEST_LENGTH],
 			  const u32 marker)
@@ -246,8 +246,8 @@ read_bitcoin_block_header(struct bitcoin_block *block,
 	SHA256_CTX sha256;
 	off_t start;
 
-	block->D9B4BEF9 = pull_u32(f, off);
-	assert(block->D9B4BEF9 == marker);
+	block->C0C0C0C0 = pull_u32(f, off);
+	assert(block->C0C0C0C0 == marker);
 	block->len = pull_u32(f, off);
 
 	/* Hash only covers version to nonce, inclusive. */
@@ -259,7 +259,7 @@ read_bitcoin_block_header(struct bitcoin_block *block,
 	block->target = pull_u32(f, off);
 	block->nonce = pull_u32(f, off);
 
-	/* Bitcoin uses double sha (it's not quite known why...) */
+	/* Dogecoin uses double sha (it's not quite known why...) */
 	SHA256_Init(&sha256);
 	if (likely(f->mmap)) {
 		SHA256_Update(&sha256, f->mmap + start, *off - start);
@@ -280,7 +280,7 @@ read_bitcoin_block_header(struct bitcoin_block *block,
 	return block;
 }
 
-void skip_bitcoin_transactions(const struct bitcoin_block *b,
+void skip_dogecoin_transactions(const struct dogecoin_block *b,
 			       off_t block_start,
 			       off_t *off)
 {
